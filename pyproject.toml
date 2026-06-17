@@ -32,3 +32,8 @@ Homepage = "https://github.com/mwageringel/guptri_py"
 Documentation = "https://guptri-py.readthedocs.io"
 Repository = "https://github.com/mwageringel/guptri_py.git"
 Issues = "https://github.com/mwageringel/guptri_py/issues"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.2",
+]
