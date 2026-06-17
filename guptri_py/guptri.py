@@ -39,8 +39,9 @@ def _guptri_np(A, B, *, epsu=None, gap=1000, zero=True, part=None):
     if not np.all(A.shape == B.shape):
         raise ValueError("matrices must be of same size")
     m, n = A.shape
-    S = A.astype(np.complex128)
-    T = B.astype(np.complex128)
+
+    S = np.array(A, dtype=np.complex128, order="F", copy=True)
+    T = np.array(B, dtype=np.complex128, order="F", copy=True)
 
     P, Q, kstr, info = fguptri(S, T, epsu, gap, zero)
     if info:
