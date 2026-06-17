@@ -14,15 +14,14 @@ C     line 17/18
       integer rtre, rtce, zrre, zrce, fnre, fnce, inre, ince
       logical zero
 
-      !f2py intent(inplace) :: a, b
-      !f2py intent(in) :: epsu, gap, zero
-      !f2py intent(out) :: pp, qq, info, kstr
-      !f2py intent(hide) :: work
-      !f2py integer intent(hide), depend(a) :: m, n
-      !f2py integer intent(hide), depend(m,n) :: lkstr = max(m,n)+6
-      !f2py integer intent(hide), depend(m,n) :: lwork =
-      !f2py+ 2*(max(m,n)*max(m,n))+m*n
-      !f2py+ +(min(m,n)*min(m,n))+12*max(m,n)+3*min(m,n)+1
+!f2py intent(inplace) :: a, b
+!f2py intent(in) :: epsu, gap, zero
+!f2py intent(out) :: pp, qq, info, kstr
+!f2py intent(hide) :: work
+!f2py integer intent(hide), depend(a) :: m, n
+!f2py integer intent(hide), depend(m,n) :: lkstr = max(m,n)+6
+!f2py integer intent(hide), depend(m,n) :: lwork = 2*(max(m,n)*max(m,n))
+!f2py+ +m*n+(min(m,n)*min(m,n))+12*max(m,n)+3*min(m,n)+1
 
        integer idbg(20), outunit
        common /debug2/ idbg, outunit
