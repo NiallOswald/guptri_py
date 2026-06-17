@@ -1,9 +1,13 @@
-*.tar.gz
 *.mexa64
 *.o
 *.so
 /build/
 /docs/_build/
+/dist/
 /local/
 /upstream/
+*.egg-info/
 __pycache__/
+*.pyc
+.pytest_cache/
+.meson_meson_private/
