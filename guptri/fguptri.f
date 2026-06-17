@@ -3,16 +3,26 @@ C     Changed 1995-02-14 torkel
 C     line 17/18
 
       subroutine fguptri(a,b,m,n,epsu,gap,zero, work, lwork,
-     $                     pp, qq, kstr, info)
+     $                     pp, qq, kstr, lkstr, info)
       implicit none
       integer m, n, info, lwork, lkstr 
-      integer kstr(4,*)
-      complex*16 a(*), b(*), pp(*), qq(*), work(*)
+      integer kstr(4,lkstr)
+      complex*16 a(m,n), b(m,n), pp(m,m), qq(n,n), work(lwork)
       double precision  epsu, gap, adelta, bdelta
       
       integer ldab, ldpp, ldqq, pstruc(4)
       integer rtre, rtce, zrre, zrce, fnre, fnce, inre, ince
       logical zero
+
+      !f2py intent(inplace) :: a, b
+      !f2py intent(in) :: epsu, gap, zero
+      !f2py intent(out) :: pp, qq, info, kstr
+      !f2py intent(hide) :: work
+      !f2py integer intent(hide), depend(a) :: m, n
+      !f2py integer intent(hide), depend(m,n) :: lkstr = max(m,n)+6
+      !f2py integer intent(hide), depend(m,n) :: lwork =
+      !f2py+ 2*(max(m,n)*max(m,n))+m*n
+      !f2py+ +(min(m,n)*min(m,n))+12*max(m,n)+3*min(m,n)+1
 
        integer idbg(20), outunit
        common /debug2/ idbg, outunit
