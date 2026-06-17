@@ -1,1 +1,2 @@
-from .guptri_py import *
+from .guptri import guptri as guptri
+from .guptri import kcf_blocks as kcf_blocks

@@ -46,6 +46,6 @@ py.extension_module('fguptri',
 
 # Install the Python package files
 py.install_sources(
-  'guptri_py/__init__.py',
+  ['guptri_py/__init__.py', 'guptri_py/guptri.py'],
   subdir: 'guptri_py',
 )

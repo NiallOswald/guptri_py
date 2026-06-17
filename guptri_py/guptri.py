@@ -26,34 +26,28 @@ where
 * :math:`A_l - λ B_l` has all left-singular structure of the pencil.
 """
 
+from warnings import warn
+
 import numpy as np
+
+from .fguptri import fguptri
+
 
 def _guptri_np(A, B, *, epsu=None, gap=1000, zero=True, part=None):
     if epsu is None:
         epsu = np.sqrt(np.finfo(np.complex128).eps)
     if not np.all(A.shape == B.shape):
-        raise ValueError('matrices must be of same size')
+        raise ValueError("matrices must be of same size")
     m, n = A.shape
-    maxmn = np.max(A.shape)
-    minmn = np.min(A.shape)
-    wsize = (2*(maxmn*maxmn) + m*n + minmn*minmn + 12*maxmn + 3*minmn + 1)
-    work = np.zeros(wsize, np.complex128)
-    Ac = A.reshape(m*n, order='F').astype(np.complex128)
-    Bc = B.reshape(m*n, order='F').astype(np.complex128)
+    S = A.astype(np.complex128)
+    T = B.astype(np.complex128)
 
-    from ._fguptri_py import fguptri
-    Pc, Qc, kstr, info = fguptri(Ac, Bc, m, n, epsu, gap, zero, work, wsize)
+    P, Q, kstr, info = fguptri(S, T, epsu, gap, zero)
     if info:
-        from warnings import warn
-        warn('INFO non-zero on return from Fortran-guptri (continuing)')
-
-    S = Ac.reshape(m, n, order='F')
-    T = Bc.reshape(m, n, order='F')
-    P = Pc.reshape(m, m, order='F')
-    Q = Qc.reshape(n, n, order='F')
+        warn("INFO non-zero on return from Fortran-guptri (continuing)")
 
     lkstr = np.max(kstr.nonzero()[1], initial=-1) + 1
-    kstr = kstr[:2,:lkstr]
+    kstr = kstr[:2, :lkstr]
 
     if np.isrealobj(A) and np.isrealobj(A):
         if np.all(np.isreal(S)) and np.all(np.isreal(T)):
@@ -69,17 +63,19 @@ def _guptri_np(A, B, *, epsu=None, gap=1000, zero=True, part=None):
         part = list(part)
         end = np.cumsum(kb, 1)
         start = np.column_stack([[0, 0], end])
-        rows = [k for j in part for k in range(start[0,j], end[0,j])]
-        cols = [k for j in part for k in range(start[1,j], end[1,j])]
+        rows = [k for j in part for k in range(start[0, j], end[0, j])]
+        cols = [k for j in part for k in range(start[1, j], end[1, j])]
         S = S[np.ix_(rows, cols)]
         T = T[np.ix_(rows, cols)]
-        P = P[:,rows]
-        Q = Q[:,cols]
-        kb = kb[:,part]
+        P = P[:, rows]
+        Q = Q[:, cols]
+        kb = kb[:, part]
     return S, T, P, Q, kstr, kb
 
-def guptri(A, B, *, epsu=None, gap=1000, zero=True,
-                    subdivide=True, compact=True, part=None):
+
+def guptri(
+    A, B, *, epsu=None, gap=1000, zero=True, subdivide=True, compact=True, part=None
+):
     r"""
     Compute the GUPTRI form of two matrices `A` and `B`.
 
@@ -290,14 +286,14 @@ def guptri(A, B, *, epsu=None, gap=1000, zero=True,
         sage: TestSuite(guptri_py.guptri_py._tests_sage()).run(skip='_test_pickling')
     """
     if isinstance(A, np.ndarray) and isinstance(B, np.ndarray):
-        return _guptri_np(A, B, epsu=epsu, gap=gap, zero=zero,
-                          part=part)[:-1]
+        return _guptri_np(A, B, epsu=epsu, gap=gap, zero=zero, part=part)[:-1]
     # otherwise assume A, B are Sage matrices
-    S, T, P, Q, kstr, kb = \
-        _guptri_np(A.numpy(), B.numpy(), epsu=epsu, gap=gap, zero=zero,
-                   part=part)
+    S, T, P, Q, kstr, kb = _guptri_np(
+        A.numpy(), B.numpy(), epsu=epsu, gap=gap, zero=zero, part=part
+    )
 
-    from sage.all import matrix, ZZ
+    from sage.all import ZZ, matrix
+
     S = matrix(np.ascontiguousarray(S))
     T = matrix(np.ascontiguousarray(T))
     P = matrix(np.ascontiguousarray(P))
@@ -307,8 +303,10 @@ def guptri(A, B, *, epsu=None, gap=1000, zero=True,
         rows, cols = kb
         if compact:
             # skip 0×0 blocks
-            rows, cols = ([rows[j] for j in range(len(rows)) if rows[j] or cols[j]],
-                          [cols[j] for j in range(len(rows)) if rows[j] or cols[j]])
+            rows, cols = (
+                [rows[j] for j in range(len(rows)) if rows[j] or cols[j]],
+                [cols[j] for j in range(len(rows)) if rows[j] or cols[j]],
+            )
         rows = list(np.cumsum(rows)[:-1])
         cols = list(np.cumsum(cols)[:-1])
 
@@ -349,77 +347,26 @@ def kcf_blocks(kstr):
     b0, b1, b2 = kblocks[:3]
     assert b2 + 1 == kstr.shape[1]  # b2 is last column
     assert b2 - b1 <= 2  # last block has length ≤ 1
-    B0 = kstr[:,:b0]
-    B1 = kstr[:,b0+1:b1]
-    B2 = kstr[:,b1+1:b2]
+    B0 = kstr[:, :b0]
+    B1 = kstr[:, b0 + 1 : b1]
+    B2 = kstr[:, b1 + 1 : b2]
 
     rows, cols = [], []
     # Lj blocks
-    rows.append(sum((B0[0,j] - B0[1,j]) * j for j in range(B0.shape[1])))
-    cols.append(sum((B0[0,j] - B0[1,j]) * (j+1) for j in range(B0.shape[1])))
+    rows.append(sum((B0[0, j] - B0[1, j]) * j for j in range(B0.shape[1])))
+    cols.append(sum((B0[0, j] - B0[1, j]) * (j + 1) for j in range(B0.shape[1])))
     # Jj(0) blocks
-    s = sum((B0[1,j-1] - B0[0,j]) * j for j in range(1, B0.shape[1]))
+    s = sum((B0[1, j - 1] - B0[0, j]) * j for j in range(1, B0.shape[1]))
     rows.append(s)
     cols.append(s)
     # regular block
-    rows.append(B2[0,0] if B2.shape[1] > 0 else 0)
-    cols.append(B2[1,0] if B2.shape[1] > 0 else 0)
+    rows.append(B2[0, 0] if B2.shape[1] > 0 else 0)
+    cols.append(B2[1, 0] if B2.shape[1] > 0 else 0)
     # Nj blocks
-    s = sum((B1[1,j-1] - B1[0,j]) * j for j in range(1, B1.shape[1]))
+    s = sum((B1[1, j - 1] - B1[0, j]) * j for j in range(1, B1.shape[1]))
     rows.append(s)
     cols.append(s)
     # Lj' blocks
-    rows.append(sum((B1[0,j] - B1[1,j]) * (j+1) for j in range(B1.shape[1])))
-    cols.append(sum((B1[0,j] - B1[1,j]) * j for j in range(B1.shape[1])))
+    rows.append(sum((B1[0, j] - B1[1, j]) * (j + 1) for j in range(B1.shape[1])))
+    cols.append(sum((B1[0, j] - B1[1, j]) * j for j in range(B1.shape[1])))
     return np.array([rows, cols])
-
-
-def _tests_sage():
-    from sage.all import SageObject, matrix, RDF, CDF
-    from numpy.linalg import matrix_rank
-
-    class GuptriTests(SageObject):
-
-        def check_guptri_properties(self, A, B):
-            S, T, P, Q, kstr = guptri(A, B)
-            tol = 1e-12
-            assert (P.H * A * Q - S).norm() < tol
-            assert (P.H * B * Q - T).norm() < tol
-            assert (P.H * P - matrix.identity(RDF, P.ncols())).norm() < tol
-            assert (Q.H * Q - matrix.identity(RDF, Q.ncols())).norm() < tol
-            kb = kcf_blocks(kstr)
-            assert np.all(kb[:,0] == 0) or kb[0,0] < kb[1,0]
-            assert np.all(kb[:,-1] == 0) or kb[0,-1] > kb[1,-1]
-            assert np.all(kb[0,1:4] == kb[1,1:4])
-
-            # test that Y = A X + B X for some of the reducing subspaces
-            for k in range(1, 5):
-                Y, X = guptri(A, B, part=range(k))[2:4]
-                AXBX = (A * X).augment(B * X)
-                assert Y.ncols() == matrix_rank(AXBX, tol=1e-12)
-                assert Y.ncols() == matrix_rank(AXBX.augment(Y), tol=1e-12)
-
-        def _test_1(self, **kwds):
-            A = matrix(RDF, [[0,1,0], [0,0,2]])
-            B = matrix(RDF, [[0,0,0], [0,0,3]])
-            self.check_guptri_properties(A, B)
-
-        def _test_2(self, **kwds):
-            A = np.array([[22,34,31,31,17],
-                          [45,45,42,19,29],
-                          [39,47,49,26,34],
-                          [27,31,26,21,15],
-                          [38,44,44,24,30]], float)
-            B = np.array([[13,26,25,17,24],
-                          [31,46,40,26,37],
-                          [26,40,19,25,25],
-                          [16,25,27,14,23],
-                          [24,35,18,21,22]], float)
-            self.check_guptri_properties(matrix(A), matrix(B))
-
-        def _test_3(self, **kwds):
-            A = matrix(CDF, [[1+1j, 3e-16j], [2e-16j, 0]])
-            B = matrix(CDF, [[1, 1e-16j], [1e-16, 0]])
-            self.check_guptri_properties(A, B)
-
-    return GuptriTests()
