@@ -1,3 +1,7 @@
+C  This file is derived from historical GUPTRI source code.
+C  Original authorship is attributed to James Demmel and Bo Kagstrom.
+C  This copy has been modified for inclusion in this package.
+
 C
 C     Changed 1995-02-14 torkel
 C     line 17/18
