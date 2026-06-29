@@ -4,33 +4,21 @@ build-backend = "mesonpy"
 
 [project]
 name = "guptri_py"
-version = "0.2.0"
-description = "A GUPTRI wrapper for NumPy and SageMath"
+version = "0.1.0"
+description = "Singular generalized eigenvalue problems. "
 readme = "README.rst"
 requires-python = ">=3.10"
 license = "MIT"
 license-files = ["LICENSE.txt"]
 authors = [
-    {name = "Markus Wageringel", email = "mwageringel@posteo.de"}
+    { name = "Markus Wageringel" }
 ]
 keywords = ["guptri", "generalized eigenvalues", "matrix pencils", "singular pencils", "fortran"]
-classifiers = [
-    "Intended Audience :: Science/Research",
-    "Operating System :: OS Independent",
-    "Programming Language :: Fortran",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Topic :: Scientific/Engineering :: Mathematics",
-]
 dependencies = ["numpy"]
 
 [project.urls]
-Homepage = "https://github.com/mwageringel/guptri_py"
 Documentation = "https://guptri-py.readthedocs.io"
 Repository = "https://github.com/mwageringel/guptri_py.git"
-Issues = "https://github.com/mwageringel/guptri_py/issues"
 
 [dependency-groups]
 dev = [
