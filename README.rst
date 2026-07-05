@@ -32,52 +32,46 @@ See the examples and documentation at
 Installation
 ============
 
-**Requirements**: `NumPy <NUMPY_>`_ and, optionally, `SageMath <SAGE_>`_
-(tested with Sage 9.6 on Arch Linux and with earlier versions on macOS).
+**Requirements**: `NumPy <NUMPY_>`_ and, optionally, `SageMath <SAGE_>`_.
 
-First, clone the `repository from GitHub <guptri_py_gh_>`_::
+To install with Python and NumPy, run the following command::
 
-    git clone https://github.com/mwageringel/guptri_py.git && cd guptri_py
-
-To install with Python 3 and NumPy, run the following command::
-
-    pip3 install --upgrade --no-index -v .
+    pip install git+https://github.com/mwageringel/guptri_py
 
 Alternatively, for use with Sage, run this command::
 
-    sage -pip install --upgrade --no-index -v .
+    sage -pip install git+https://github.com/mwageringel/guptri_py
 
-To install into the Python user install directory (no root access required),
-use::
+Optionally, pass `--user` to install into the Python user install directory (no root access required).
 
-    sage -pip install --upgrade --no-index -v --user .
+After successful installation, to run the tests::
 
-After successful installation, run the tests with Sage::
-
-    sage -t guptri_py
+    git clone https://github.com/mwageringel/guptri_py.git && cd guptri_py
+    (cd tests && python -m pytest .)
 
 Installing into a virtual environment (with system packages)::
 
-    python -m venv --system-site-packages ./venv   # assumes that setuptools and numpy are installed system-wide
+    python -m venv --system-site-packages ./venv   # assumes that numpy and meson (and optionally sage) are installed system-wide
 
-    ./venv/bin/pip3 install --upgrade --no-index -v .
-    # ./venv/bin/pip3 install --upgrade --no-index -v --no-build-isolation .
+    ./venv/bin/pip install --upgrade --no-index -v .
+    # ./venv/bin/pip install --upgrade --no-index -v --no-build-isolation .   # this alternative may be needed to find meson
 
-    cd ./venv && ./bin/python   # it is important to change to a different directory
-    cd ./venv && ./bin/python -m IPython   # (or using IPython)
+    (cd venv/ && ./bin/python -m pytest ../tests/)  # running tests (changing to a different directory is important)
+
+    (cd ./venv && ./bin/python)   # it is important to change to a different directory
+    (cd ./venv && ./bin/python -m IPython)   # (or using IPython)
 
 Installing into a virtual environment (without system packages)::
 
     python -m venv ./venv
-    ./venv/bin/pip3 install numpy
-    ./venv/bin/pip3 install wheel
-    ./venv/bin/pip3 install --upgrade --no-index -v .
-    cd ./venv && ./bin/python -m IPython   # (or using IPython)
+    ./venv/bin/pip install git+https://github.com/mwageringel/guptri_py
+    ./venv/bin/pip install pytest
+    (cd ./venv && ./bin/python -m pytest ../tests/)
+    (cd ./venv && ./bin/python -m IPython)
 
 Issues
 ------
 
-* With Python 3.12+ and NumPy 1.26+, the build currently fails as numpy.distutils has been removed (#1).
 * With NumPy ≤ 1.17, it may be necessary to set::
 
     export NPY_DISTUTILS_APPEND_FLAGS=1

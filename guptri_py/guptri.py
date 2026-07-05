@@ -157,18 +157,18 @@ def guptri(
     ::
 
         >>> np.linalg.norm(A - P.dot(S.dot(Q.T.conj()))) < 1e-12
-        True
+        np.True_
         >>> np.linalg.norm(B - P.dot(T.dot(Q.T.conj()))) < 1e-12
-        True
+        np.True_
 
     We extract the block sizes and conclude that there are two `0` eigenvalues,
     one finite eigenvalue at `2` and one infinite eigenvalue::
 
         >>> kcf_blocks(kstr)
         array([[0, 2, 1, 1, 1],
-               [1, 2, 1, 1, 0]])
-        >>> S[2,3] / T[2,3]  # tol 1e-13
-        2.0
+               [1, 2, 1, 1, 0]], dtype=int32)
+        >>> abs(S[2,3] / T[2,3] - 2.0) < 1e-13
+        np.True_
 
     |
 
@@ -280,11 +280,6 @@ def guptri(
         [|  1.0]  [0.0|1.0]
         [|1e-16], [1.0|0.0]
         )
-
-    TESTS::
-
-        sage: import guptri_py
-        sage: TestSuite(guptri_py.guptri_py._tests_sage()).run(skip='_test_pickling')
     """
     if isinstance(A, np.ndarray) and isinstance(B, np.ndarray):
         return _guptri_np(A, B, epsu=epsu, gap=gap, zero=zero, part=part)[:-1]
