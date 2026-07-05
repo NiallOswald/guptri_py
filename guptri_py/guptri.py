@@ -26,11 +26,7 @@ where
 * :math:`A_l - λ B_l` has all left-singular structure of the pencil.
 """
 
-from warnings import warn
-
 import numpy as np
-
-from .fguptri import fguptri
 
 
 def _guptri_np(A, B, *, epsu=None, gap=1000, zero=True, part=None):
@@ -43,8 +39,10 @@ def _guptri_np(A, B, *, epsu=None, gap=1000, zero=True, part=None):
     S = np.asfortranarray(A, dtype=np.complex128)
     T = np.asfortranarray(B, dtype=np.complex128)
 
+    from .fguptri import fguptri
     P, Q, kstr, info = fguptri(S, T, epsu, gap, zero)
     if info:
+        from warnings import warn
         warn("INFO non-zero on return from Fortran-guptri (continuing)")
 
     lkstr = np.max(kstr.nonzero()[1], initial=-1) + 1
